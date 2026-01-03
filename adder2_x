@@ -1,0 +1,43 @@
+module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);//
+    
+    wire [15:0] sum_high, sum_low;
+    wire cout_high;
+    wire [16:0] carry;
+    assign carry[0] = 1'b0;
+
+    genvar i;
+    generate 
+        for (i=0 ; i<16 ; i=i+1) begin: adder1
+        
+        add1 add_low (
+            .a(a[i]),
+            .b(b[i]),
+            .cin(carry[i]),
+            .sum(sum_low[i]),
+            .cout(carry[i+1])
+        );
+        end
+    endgenerate
+    
+    add16 add_high ( 
+        .a(a[31:16]), 
+        .b(b[31:16]),
+        .cin(carry[16]),
+        .sum(sum_high),
+        .cout(cout_high)
+    );
+    
+    assign sum = {sum_high, sum_low};
+    
+endmodule
+
+module add1 ( input a, input b, input cin, output sum, output cout );
+
+// Full adder module here
+    assign {cout, sum} = a + b + cin;
+    
+endmodule
